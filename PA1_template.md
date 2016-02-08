@@ -1,18 +1,26 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
-```{r, message=FALSE}
+
+```r
 library(dplyr)
+```
+
+```
+## Warning: package 'dplyr' was built under R version 3.2.3
+```
+
+```r
 library(ggplot2)
 ```
 
-```{r, echo=TRUE}
+```
+## Warning: package 'ggplot2' was built under R version 3.2.3
+```
+
+
+```r
 if(!file.exists("./activity.csv"))
    {
       unzip("./activity.zip")
@@ -25,20 +33,19 @@ activities$date <- as.Date(activities$date)  ## Assign datatype date
 ## What is mean total number of steps taken per day?
 
 Histogram of the total number of steps taken each day
-```{r, echo=TRUE}
+
+```r
 ## Creats Histogram of Steps by Date
 a <- ggplot(activities,aes(date))+ geom_histogram(bins = 62, aes(weight = steps), binwidth = .5)+ylab("Total Steps") + xlab("Date")+ggtitle("Daily Step Count")
 ```
 
 
-```{r, echo=FALSE}
-a
-```
+![](PA1_template_files/figure-html/unnamed-chunk-4-1.png)
 
 
 Mean and median number of steps taken each day
-```{r, echo=TRUE}
 
+```r
 activities2 <- group_by(activities,date)
 totalDailySteps <- summarise_each(activities2, funs(sum(.,na.rm = TRUE)), -interval)
 
@@ -47,18 +54,18 @@ meanDailySteps <- mean(totalDailySteps$steps, na.rm = TRUE)
 
 ##Median of Total Steps Taken Each Day
 medianDailySteps <- median(totalDailySteps$steps, na.rm = TRUE)
-
-
 ```
 Mean number of steps taken each day
 
-```{r, echo=FALSE}
-meanDailySteps
+
+```
+## [1] 9354.23
 ```
 
 Median number of steps taken each day
-```{r, echo=FALSE}
-medianDailySteps
+
+```
+## [1] 10395
 ```
 
 
@@ -66,7 +73,8 @@ medianDailySteps
 ## What is the average daily activity pattern?
 
 Time series plot of the average number of steps taken
-```{r, echo=TRUE}
+
+```r
 activities3 <- group_by(activities,interval)
 activities_interval_means <- summarise_each(activities3, funs(mean(.,na.rm = TRUE)), -date)
 
@@ -74,25 +82,27 @@ g <- ggplot(activities_interval_means, aes(interval, steps)) + geom_line()
 ```
 
 
-```{r, echo=FALSE}
-g
-```
+![](PA1_template_files/figure-html/unnamed-chunk-9-1.png)
 
 
 The 5-minute interval that, on average, contains the maximum number of steps
-```{r, echo=TRUE}
+
+```r
 minutes <- group_by(activities,interval)
 average_steps_by_minute <-summarise_each(minutes, funs(mean(.,na.rm=TRUE)),-date)
 max_steps <- max(average_steps_by_minute$steps)
 max_steps_interval <-  filter(average_steps_by_minute, steps == max_steps)$interval
-
 ```
 
 Interval with the Most Steps
 
-```{r, echo=TRUE}
 
+```r
 max_steps_interval
+```
+
+```
+## [1] 835
 ```
 
 
@@ -100,8 +110,8 @@ max_steps_interval
 
 ## Imputing missing values
 
-```{r, echo=TRUE}
 
+```r
 ## Total Number of Missing Calculations
 missingValueCount <- subset(activities,is.na(steps))
 numMissingValues <- nrow(missingValueCount)
@@ -122,13 +132,12 @@ for(i in 1:nrow(activitiesFilled)){
 ## Creats Histogram of Steps by Date
 f <- ggplot(activitiesFilled,aes(date))+ geom_histogram(bins = 62, aes(weight = steps), binwidth = .5)+ylab("Total Steps") + xlab("Date")+ggtitle("Daily Step Count with Missing Values Filled")
 ```
-```{r, echo=FALSE}
-f
-```
+![](PA1_template_files/figure-html/unnamed-chunk-13-1.png)
 
 Mean and Median Total Number of Steps Taken Each Day
 
-```{r, echo=TRUE}
+
+```r
 activitiesFilled2 <- group_by(activitiesFilled,date)
 totalDailyStepsFilled <- summarise_each(activitiesFilled2, funs(sum(.,na.rm = TRUE)), -interval)
 
@@ -144,23 +153,25 @@ medianDailyStepsFilled <- median(totalDailyStepsFilled$steps, na.rm = TRUE)
 Mean number of steps taken each day
 Note: The mean number of steps taken each day with the missing values filled in is larger than the original dataset.
 
-```{r, echo=FALSE}
-meanDailyStepsFilled
+
+```
+## [1] 10765.64
 ```
 
 Median number of steps taken each day
 Note: The mediaan number of steps taken each day with the missing values filled in is larger than the original dataset.
 
-```{r, echo=FALSE}
-medianDailyStepsFilled
+
+```
+## [1] 10762
 ```
 
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r, echo=TRUE}
 
+```r
 activitiesFilledDayOfWeek <- activitiesFilled
 
 weekday <- c("Monday","Tuesday","Wednesday","Thursday","Friday")
@@ -173,5 +184,4 @@ average_steps_by_minuteFilled <-summarise_each(minutesFilled, funs(mean(.,na.rm=
 
 Plot shows that the number of steps is more evenly distributed across intervals for weekends.
 
-```{r, echo=FALSE}
-ggplot(average_steps_by_minuteFilled, aes(x=interval, y = steps)) + geom_line()+facet_grid(DayOfWeekCat~.)+xlab("Interval")+ylab("Number of steps")
+![](PA1_template_files/figure-html/unnamed-chunk-18-1.png)
